@@ -4,6 +4,7 @@ import {
   MapPin, Newspaper, Briefcase, ArrowRight, Heart,
   ShieldCheck, Users, Sparkles, Building2,
 } from "lucide-react";
+import heroImg from "@/assets/haven-hero.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -69,20 +70,14 @@ function Landing() {
             </div>
           </div>
 
-          {/* Hero card mock */}
+          {/* Hero image */}
           <div className="relative">
             <div className="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-br from-primary/20 to-secondary/20 blur-2xl" />
-            <div className="rounded-3xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground">Nearby help · 1.2 km</span>
-                <span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-semibold text-success">LIVE</span>
-              </div>
-              <div className="mt-4 grid gap-3">
-                <MiniCard icon={<MapPin className="h-4 w-4" />} title="Sunrise Night Shelter" sub="12 beds open · opens 6pm" tag="Available" tagClass="bg-success/15 text-success" />
-                <MiniCard icon={<Heart className="h-4 w-4" />} title="Hope Kitchen" sub="Hot dinner until 9pm" tag="Open" tagClass="bg-primary-soft text-primary" />
-                <MiniCard icon={<Briefcase className="h-4 w-4" />} title="Warehouse helper · today" sub="$18/hr · cash daily" tag="Hiring" tagClass="bg-secondary/20 text-secondary-foreground" />
-              </div>
-            </div>
+            <img
+              src={heroImg}
+              alt="Haven dashboard preview showing safe night mode with city skyline and security insights"
+              className="w-full rounded-3xl border border-border object-cover shadow-[var(--shadow-soft)]"
+            />
           </div>
         </div>
       </section>
