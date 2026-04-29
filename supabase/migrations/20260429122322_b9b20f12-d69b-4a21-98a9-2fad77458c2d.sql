@@ -1,0 +1,1 @@
+ALTER VIEW public.user_impact SET (security_invoker = true);
