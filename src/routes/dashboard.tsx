@@ -11,8 +11,14 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import {
   MapPin, Newspaper, Briefcase, Heart, Phone, Clock, Bed, Utensils,
-  Stethoscope, Shirt, Navigation, ThumbsUp, LogOut, Plus, Search, Trash2, Loader2,
+  Stethoscope, Shirt, ThumbsUp, LogOut, Plus, Search, Trash2, Loader2, Trophy,
 } from "lucide-react";
+import { LiveMap } from "@/components/LiveMap";
+import { SOSButton } from "@/components/SOSButton";
+import { HavenAssistant } from "@/components/HavenAssistant";
+import { TrustPanel } from "@/components/TrustPanel";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { useRealtimeAlerts } from "@/hooks/useRealtimeAlerts";
 
 type Resource = Database["public"]["Tables"]["resources"]["Row"];
 type FeedPost = Database["public"]["Tables"]["feed_posts"]["Row"];
@@ -36,6 +42,7 @@ function Dashboard() {
   const { user, loading, isNgo, isEmployer } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("map");
+  useRealtimeAlerts();
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -60,6 +67,12 @@ function Dashboard() {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link to="/"><Logo /></Link>
           <div className="flex items-center gap-2">
+            <Link
+              to="/impact"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-card px-3 text-sm text-foreground hover:bg-accent"
+            >
+              <Trophy className="h-4 w-4 text-secondary" /> <span className="hidden sm:inline">Impact</span>
+            </Link>
             <ThemeToggle />
             <button
               onClick={handleSignOut}
@@ -89,6 +102,9 @@ function Dashboard() {
         {tab === "feed" && <FeedView />}
         {tab === "jobs" && <JobsView />}
       </main>
+
+      <SOSButton />
+      <HavenAssistant />
     </div>
   );
 }
