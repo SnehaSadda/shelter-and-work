@@ -1,8 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { z } from "zod";
+import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { User, Building2, Briefcase } from "lucide-react";
+import { signUpWithEmail, type Role } from "@/services/auth";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({
@@ -16,17 +20,48 @@ export const Route = createFileRoute("/signup")({
   component: SignupPage,
 });
 
-type Role = "user" | "ngo" | "employer";
+const schema = z.object({
+  email: z.string().trim().email("Enter a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters").max(72),
+  name: z.string().trim().max(100).optional(),
+  phone: z.string().trim().max(30).optional(),
+  orgName: z.string().trim().max(120).optional(),
+});
 
 function SignupPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [role, setRole] = useState<Role>("user");
+  const [form, setForm] = useState({ email: "", password: "", name: "", phone: "", orgName: "" });
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (user) navigate({ to: "/dashboard" });
+  }, [user, navigate]);
 
   const roles: { id: Role; title: string; desc: string; Icon: typeof User }[] = [
     { id: "user", title: "I need help", desc: "Find shelter, food & jobs nearby", Icon: User },
     { id: "ngo", title: "NGO / Volunteer", desc: "Share resources & updates", Icon: Building2 },
     { id: "employer", title: "Employer", desc: "Post short-term work", Icon: Briefcase },
   ];
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const parsed = schema.safeParse(form);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0].message);
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await signUpWithEmail({ ...parsed.data, role });
+    setSubmitting(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Account created! Check your email to confirm.");
+    navigate({ to: "/dashboard" });
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -69,22 +104,26 @@ function SignupPage() {
           </div>
         </div>
 
-        <form
-          className="grid gap-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            navigate({ to: "/dashboard" });
-          }}
-        >
-          <Field label="Name (optional)" name="name" placeholder="Your name" />
-          <Field label="Phone number (optional)" name="phone" type="tel" placeholder="(555) 123-4567" />
-          <Field label="Password" name="password" type="password" placeholder="Choose a password" required />
+        <form className="grid gap-3" onSubmit={onSubmit}>
+          <Field label="Email" type="email" required value={form.email}
+            onChange={(v) => setForm((f) => ({ ...f, email: v }))} placeholder="you@example.com" />
+          <Field label="Name (optional)" value={form.name}
+            onChange={(v) => setForm((f) => ({ ...f, name: v }))} placeholder="Your name" />
+          {role !== "user" && (
+            <Field label="Organization name" value={form.orgName}
+              onChange={(v) => setForm((f) => ({ ...f, orgName: v }))} placeholder="e.g. Hope Foundation" />
+          )}
+          <Field label="Phone (optional)" type="tel" value={form.phone}
+            onChange={(v) => setForm((f) => ({ ...f, phone: v }))} placeholder="(555) 123-4567" />
+          <Field label="Password" type="password" required value={form.password}
+            onChange={(v) => setForm((f) => ({ ...f, password: v }))} placeholder="At least 6 characters" />
 
           <button
             type="submit"
-            className="mt-2 inline-flex h-11 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+            disabled={submitting}
+            className="mt-2 inline-flex h-11 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-60"
           >
-            Create account
+            {submitting ? "Creating account…" : "Create account"}
           </button>
           <p className="text-center text-xs text-muted-foreground">
             Already have one?{" "}
@@ -96,13 +135,24 @@ function SignupPage() {
   );
 }
 
-function Field(props: React.InputHTMLAttributes<HTMLInputElement> & { label: string }) {
-  const { label, ...rest } = props;
+function Field(props: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  placeholder?: string;
+  required?: boolean;
+}) {
+  const { label, value, onChange, type = "text", placeholder, required } = props;
   return (
     <label className="grid gap-1.5">
       <span className="text-xs font-medium text-muted-foreground">{label}</span>
       <input
-        {...rest}
+        type={type}
+        value={value}
+        required={required}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
         className="h-11 rounded-lg border border-input bg-card px-3 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-ring/30"
       />
     </label>
