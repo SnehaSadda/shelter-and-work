@@ -130,6 +130,7 @@ function ResourcesView() {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("");
   const [showForm, setShowForm] = useState(false);
+  const { pos: userPos } = useGeolocation();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -197,28 +198,9 @@ function ResourcesView() {
         )}
       </div>
 
-      <MapPanel count={items.length} />
-    </div>
-  );
-}
-
-function MapPanel({ count }: { count: number }) {
-  return (
-    <div className="relative h-[420px] overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] lg:sticky lg:top-24">
-      <div className="absolute inset-0" style={{
-        backgroundImage:
-          "radial-gradient(circle at 30% 40%, oklch(0.65 0.15 250 / 0.18), transparent 50%), radial-gradient(circle at 70% 60%, oklch(0.78 0.16 65 / 0.15), transparent 50%), linear-gradient(135deg, var(--color-primary-soft), var(--color-background))",
-      }} />
-      <div className="absolute inset-0 opacity-40" style={{
-        backgroundImage:
-          "linear-gradient(var(--color-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-border) 1px, transparent 1px)",
-        backgroundSize: "32px 32px",
-      }} />
-      <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-xl border border-border bg-background/90 p-3 backdrop-blur">
-        <div className="flex items-center gap-2 text-sm">
-          <Navigation className="h-4 w-4 text-primary" />
-          <span className="font-medium">{count} place{count === 1 ? "" : "s"} nearby</span>
-        </div>
+      <div className="lg:sticky lg:top-24 lg:self-start grid gap-4">
+        <LiveMap resources={items} userPos={userPos} />
+        <TrustPanel />
       </div>
     </div>
   );
