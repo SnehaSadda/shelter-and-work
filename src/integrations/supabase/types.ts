@@ -152,28 +152,37 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          bio: string | null
           created_at: string
           id: string
           name: string | null
           org_name: string | null
           phone: string | null
           updated_at: string
+          verified: boolean
         }
         Insert: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           id: string
           name?: string | null
           org_name?: string | null
           phone?: string | null
           updated_at?: string
+          verified?: boolean
         }
         Update: {
+          avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           id?: string
           name?: string | null
           org_name?: string | null
           phone?: string | null
           updated_at?: string
+          verified?: boolean
         }
         Relationships: []
       }
@@ -225,6 +234,39 @@ export type Database = {
         }
         Relationships: []
       }
+      sos_alerts: {
+        Row: {
+          created_at: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          message: string | null
+          resolved_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          message?: string | null
+          resolved_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          message?: string | null
+          resolved_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -248,7 +290,39 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_impact: {
+        Row: {
+          helpful_received: number | null
+          jobs_count: number | null
+          name: string | null
+          org_name: string | null
+          posts_count: number | null
+          resources_count: number | null
+          user_id: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          helpful_received?: never
+          jobs_count?: never
+          name?: string | null
+          org_name?: string | null
+          posts_count?: never
+          resources_count?: never
+          user_id?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          helpful_received?: never
+          jobs_count?: never
+          name?: string | null
+          org_name?: string | null
+          posts_count?: never
+          resources_count?: never
+          user_id?: string | null
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
